@@ -6,9 +6,13 @@ const Tournament = require('./Tournament');
 
 const team = new Team(2, 1);
 
-team.buildTeamAsync();
+team.buildTeamAsync()
+    .then(() => {
+      const tournament = new Tournament(team, 5);
+      tournament.playTournament();
+    });
 
-const tournament = new Tournament(team, 5);
+
 
 
 

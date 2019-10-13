@@ -10,22 +10,22 @@ class Tournament {
   constructor(team, rounds) {
     this.team = team;
     this.rounds = rounds;
+    this.score = 0;
   }
   /**
  *
  * start tournament
  */
   playTournament() {
-    console.log('teamLength: ', this.team.length);
     this.playRound(0, this.rounds);
-    console.log('tournament score:', tournamentScore);
+    console.log('tournament score:', this.score);
 
     let outcome;
 
-    if (tournamentScore < 0) {
+    if (this.score < 0) {
       outcome = 'lost';
-    } else if (tournamentScore > 0) {
-      outcome = 'win';
+    } else if (this.score > 0) {
+      outcome = 'won';
     } else {
       outcome = 'tied';
     }
@@ -34,9 +34,9 @@ class Tournament {
         `Your team ${outcome}!`
     );
 
-    this.team.forEach((player) => {
-      if (tournamentScore > 0) player.goodGame();
-      else if (tournamentScore < 0) player.badGame();
+    this.team.starters.forEach((player) => {
+      if (this.score > 0) player.goodGame();
+      else if (this.score < 0) player.badGame();
       player.printStats();
     });
   }
@@ -53,11 +53,11 @@ class Tournament {
     const rando = () => Math.ceil(Math.random() * 20);
     const enemyOffense = rando();
     const enemyDefense = rando();
-    const myOffensivePower = team
+    const myOffensivePower = this.team.starters
         .map((it) => it.offense)
         .reduce((sum, it) => sum + it);
 
-    const myDefensivePower = team
+    const myDefensivePower = this.team.starters
         .map((it) => it.defense)
         .reduce((sum, it) => sum + it);
 
@@ -68,7 +68,7 @@ class Tournament {
       change == 1 ? 'won' :
       'lost';
 
-    tournamentScore += change;
+    this.score += change;
     console.log(`Round ${count}: you ${outcome}`);
 
     count++;
@@ -77,7 +77,7 @@ class Tournament {
     if (change) {
       // doSubbing();
     } else {
-      playRound(count, rounds);
+      this.playRound(count);
     }
   };
 }
