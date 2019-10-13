@@ -1,3 +1,5 @@
+const inquirer = require('inquirer');
+
 const Player = require('./Player');
 
 /**
@@ -30,20 +32,21 @@ class Team {
     }
 
     return prompts.reduce((promiseChain, currentTask) => {
-      return promiseChain.then((chainResults) => currentTask());
+      return promiseChain.then(() => currentTask());
     }, Promise.resolve());
   }
   /**
    *
    * @param {boolean} isStarter
+   * @return {Promise} Promise of completed player input;
    */
   addPlayerAsync(isStarter) {
     // runs inquirer and asks the user a series of questions whose replies are
     // stored within the variable answers inside of the .then statement
-    console.log('-----');
+    console.log('\n-----');
     console.log(`Add a new ${isStarter ? 'starting' : 'sub'} player`);
 
-    inquirer.prompt([
+    return inquirer.prompt([
       {
         name: 'name',
         message: 'What is the player\'s name?',
@@ -74,6 +77,8 @@ class Team {
       } else {
         this.subs.push(player);
       }
+
+      return player;
     });
   }
 }
