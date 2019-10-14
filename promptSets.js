@@ -31,13 +31,15 @@ module.exports = {
         ],
       }, {
         name: 'offense',
-        message: 'What is the player\'s offensive skill level?',
+        message: 'What is the player\'s offensive skill level (1 - 10)?',
         type: 'number',
+        default: 5,
         validate: withinRange,
       }, {
         name: 'defense',
-        message: 'What is the player\'s defensive skill level?',
+        message: 'What is the player\'s defensive skill level (1 - 10)?',
         type: 'number',
+        default: 5,
         validate: withinRange,
       },
     ];

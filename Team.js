@@ -44,8 +44,14 @@ class Team {
   addPlayerAsync(isStarter) {
     // runs inquirer and asks the user a series of questions whose replies are
     // stored within the variable answers inside of the .then statement
+
+    const maxCount = this[isStarter ? 'startersCount' : 'subsCount'];
+    const currentCount = this[isStarter ? 'starters' : 'subs'].length + 1;
+    const countSummary = `(${currentCount} of ${maxCount})`;
+    const playerType = isStarter ? 'starting' : 'sub';
+
     console.log('\n-----');
-    console.log(`Add a new ${isStarter ? 'starting' : 'sub'} player`);
+    console.log(`Add a new ${playerType} player ${countSummary}`);
 
     const playerChoices = [
       'Derek Jeter',
@@ -53,6 +59,10 @@ class Team {
       'Tim Tebow',
       'CC Sabathia',
       'Gary Sanchez',
+      'Brett Gardner',
+      'Aaron Hicks',
+      'Gio Urshela',
+      'Luis Severino',
     ];
 
     const unpickedPlayers = playerChoices.filter((it) => {

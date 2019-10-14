@@ -23,6 +23,12 @@ class Tournament {
  * @return {Promise}
  */
   playTournamentAsync() {
+    console.log(`
+-------------
+The tournament is starting!
+-------------
+`);
+
     const roundsToPlay = [];
     for (let i = 0; i < this.rounds; i++) {
       roundsToPlay.push(() => this.playRoundAsync(i + 1));
@@ -43,7 +49,7 @@ class Tournament {
           }
 
           console.log(
-              `Your team ${outcome}!`
+              `Your team ${outcome} the tournament!`
           );
 
           this.team.starters.forEach((player) => {
@@ -76,7 +82,7 @@ class Tournament {
     this.score += change;
     console.log(`Round ${count}: you ${outcome}`);
 
-    if (change) {
+    if (change && count < this.rounds) {
       return this.offerSubChanceAsync();
     } else {
       return Promise.resolve();
