@@ -4,13 +4,33 @@ const inquirer = require('inquirer');
 const Team = require('./Team');
 const Tournament = require('./Tournament');
 
-const team = new Team(2, 1);
+/**
+ * This is the main entry point to the whole application
+ */
+function playTeamManager() {
+  const team = new Team(2, 1);
+  team.buildTeamAsync()
+      .then(() => {
+        const tournament = new Tournament(team, 5);
+        return tournament.playTournamentAsync();
+      })
+      .then(() => {
+        return inquirer.prompt([
+          {
+            name: 'playAgain',
+            type: 'confirm',
+            message: `Do you want play again?`,
+          },
+        ])
+            .then((answers) => {
+              if (answers.playAgain) playTeamManager();
+            });
+      });
+}
 
-team.buildTeamAsync()
-    .then(() => {
-      const tournament = new Tournament(team, 5);
-      tournament.playTournamentAsync();
-    });
+playTeamManager();
+
+
 
 
 

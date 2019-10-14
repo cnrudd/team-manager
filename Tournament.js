@@ -26,9 +26,7 @@ class Tournament {
       roundsToPlay.push(() => this.playRoundAsync(i + 1));
     }
 
-    return roundsToPlay.reduce((promiseChain, currentTask) => {
-      return promiseChain.then(currentTask);
-    }, Promise.resolve())
+    return utils.runPromisesInSeries(roundsToPlay)
         .then(() => {
           console.log('tournament score:', this.score);
 
@@ -106,11 +104,13 @@ class Tournament {
           if (answers.wantsToSub) {
             // assumes no players have the same name
             const indexOfStarterToTakeOut = this.team.starters
-                .findIndex((it) => it.name = answers.doSub);
+                .findIndex((it) => it.name == answers.doSub);
+
             const starterTakenOut = this.team.starters
                 .splice(indexOfStarterToTakeOut, 1)[0];
+
             // assumes only one sub
-            const sub = this.team.subs.splice(0, 1)[0];
+            const sub = this.team.subs.splice(0)[0];
 
             this.team.starters.push(sub);
             this.team.subs.push(starterTakenOut);

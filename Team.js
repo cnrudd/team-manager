@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 
+const utils = require('./utils');
 const prompSets = require('./promptSets');
 const Player = require('./Player');
 
@@ -32,10 +33,9 @@ class Team {
       prompts.push(() => this.addPlayerAsync(false));
     }
 
-    return prompts.reduce((promiseChain, currentTask) => {
-      return promiseChain.then(currentTask);
-    }, Promise.resolve());
+    return utils.runPromisesInSeries(prompts);
   }
+
   /**
    *
    * @param {boolean} isStarter
