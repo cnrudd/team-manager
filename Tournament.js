@@ -1,4 +1,6 @@
 const inquirer = require('inquirer');
+
+const promptSets = require('./promptSets');
 const utils = require('./utils');
 
 /**
@@ -86,20 +88,8 @@ class Tournament {
    */
   offerSubChanceAsync() {
     const subName = this.team.subs[0].name;
-    return inquirer.prompt([
-      {
-        name: 'wantsToSub',
-        type: 'confirm',
-        message: `Do you want to bring in substitute player ${subName}?`,
-      },
-      {
-        name: 'doSub',
-        type: 'list',
-        message: `Please pick a starter to replace with ${subName}?`,
-        choices: this.team.starters.map((player) => player.name),
-        when: (answers) => answers.wantsToSub,
-      },
-    ])
+    const prompts = promptSets.subPlayer(subName, this.team.starters);
+    return inquirer.prompt(prompts)
         .then((answers) => {
           if (answers.wantsToSub) {
             // assumes no players have the same name

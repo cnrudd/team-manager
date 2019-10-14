@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 
 const utils = require('./utils');
-const prompSets = require('./promptSets');
+const promptSets = require('./promptSets');
 const Player = require('./Player');
 
 /**
@@ -47,7 +47,21 @@ class Team {
     console.log('\n-----');
     console.log(`Add a new ${isStarter ? 'starting' : 'sub'} player`);
 
-    return inquirer.prompt(prompSets.addPlayer)
+    const playerChoices = [
+      'Derek Jeter',
+      'Daryll Strawberry',
+      'Tim Tebow',
+      'CC Sabathia',
+      'Gary Sanchez',
+    ];
+
+    const unpickedPlayers = playerChoices.filter((it) => {
+      const starterNames = this.starters.map((it) => it.name);
+      const subNames = this.subs.map((it) => it.name);
+      return !starterNames.includes(it) && !subNames.includes(it);
+    });
+
+    return inquirer.prompt(promptSets.addPlayer(unpickedPlayers))
         .then((answers) => {
           const player = new Player(
               answers.name,

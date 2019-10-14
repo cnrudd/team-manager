@@ -12,38 +12,50 @@ function withinRange(input, answers) {
 }
 
 module.exports = {
-  addPlayer: [
-    {
-      name: 'name',
-      message: 'What is the player\'s name?',
-      type: 'list',
-      choices: [
-        'Derek Jeter',
-        'Daryll Strawberry',
-        'Tim Tebow',
-        'CC Sabathia',
-        'Gary Sanchez',
-      ],
-    }, {
-      name: 'position',
-      message: 'What is the player\'s position?',
-      type: 'list',
-      choices: [
-        'Pitcher',
-        'Catcher',
-        'Infielder',
-        'Outfielder',
-      ],
-    }, {
-      name: 'offense',
-      message: 'What is the player\'s offensive skill level?',
-      type: 'number',
-      validate: withinRange,
-    }, {
-      name: 'defense',
-      message: 'What is the player\'s defensive skill level?',
-      type: 'number',
-      validate: withinRange,
-    },
-  ],
+  addPlayer(playerChoices) {
+    return [
+      {
+        name: 'name',
+        message: 'What is the player\'s name?',
+        type: 'list',
+        choices: playerChoices,
+      }, {
+        name: 'position',
+        message: 'What is the player\'s position?',
+        type: 'list',
+        choices: [
+          'Pitcher',
+          'Catcher',
+          'Infielder',
+          'Outfielder',
+        ],
+      }, {
+        name: 'offense',
+        message: 'What is the player\'s offensive skill level?',
+        type: 'number',
+        validate: withinRange,
+      }, {
+        name: 'defense',
+        message: 'What is the player\'s defensive skill level?',
+        type: 'number',
+        validate: withinRange,
+      },
+    ];
+  },
+  subPlayer(subName, starters) {
+    return [
+      {
+        name: 'wantsToSub',
+        type: 'confirm',
+        message: `Do you want to bring in substitute player ${subName}?`,
+      },
+      {
+        name: 'doSub',
+        type: 'list',
+        message: `Please pick a starter to replace with ${subName}?`,
+        choices: starters.map((player) => player.name),
+        when: (answers) => answers.wantsToSub,
+      },
+    ];
+  },
 };
