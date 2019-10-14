@@ -49,9 +49,6 @@ class Team {
 
     return inquirer.prompt(prompSets.addPlayer)
         .then((answers) => {
-          // initializes the variable newProgrammer
-          // to be a programmer object which will take
-          // in all of the user's answers to the questions above
           const player = new Player(
               answers.name,
               answers.position,

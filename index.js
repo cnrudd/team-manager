@@ -9,7 +9,7 @@ const team = new Team(2, 1);
 team.buildTeamAsync()
     .then(() => {
       const tournament = new Tournament(team, 5);
-      tournament.playTournament();
+      tournament.playTournamentAsync();
     });
 
 

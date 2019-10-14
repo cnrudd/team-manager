@@ -1,3 +1,4 @@
+const inquirer = require('inquirer');
 const utils = require('./utils');
 
 /**
@@ -17,41 +18,49 @@ class Tournament {
   /**
  *
  * start tournament
+ * @return {Promise}
  */
-  playTournament() {
-    this.playRound(0, this.rounds);
-    console.log('tournament score:', this.score);
-
-    let outcome;
-
-    if (this.score < 0) {
-      outcome = 'lost';
-    } else if (this.score > 0) {
-      outcome = 'won';
-    } else {
-      outcome = 'tied';
+  playTournamentAsync() {
+    const roundsToPlay = [];
+    for (let i = 0; i < this.rounds; i++) {
+      roundsToPlay.push(() => this.playRoundAsync(i + 1));
     }
 
-    console.log(
-        `Your team ${outcome}!`
-    );
+    return roundsToPlay.reduce((promiseChain, currentTask) => {
+      return promiseChain.then(currentTask);
+    }, Promise.resolve())
+        .then(() => {
+          console.log('tournament score:', this.score);
 
-    this.team.starters.forEach((player) => {
-      if (this.score > 0) player.goodGame();
-      else if (this.score < 0) player.badGame();
-      player.printStats();
-    });
+          let outcome;
+
+          if (this.score < 0) {
+            outcome = 'lost';
+          } else if (this.score > 0) {
+            outcome = 'won';
+          } else {
+            outcome = 'tied';
+          }
+
+          console.log(
+              `Your team ${outcome}!`
+          );
+
+          this.team.starters.forEach((player) => {
+            if (this.score > 0) player.goodGame();
+            else if (this.score < 0) player.badGame();
+            player.printStats();
+          });
+        });
   }
 
 
   /**
  *
  * @param {*} count
+ * @return {Promise}
  */
   playRoundAsync(count) {
-    if (count == this.rounds) {
-      return;
-    }
     const enemyOffense = utils.randomNumber(20, 1);
     const enemyDefense = utils.randomNumber(20, 1);
     const myOffensivePower = this.calcPower('offense');
@@ -67,14 +76,50 @@ class Tournament {
     this.score += change;
     console.log(`Round ${count}: you ${outcome}`);
 
-    count++;
-
     if (change) {
-      // doSubbing();
+      return this.offerSubChanceAsync();
     } else {
-      this.playRound(count);
+      return Promise.resolve();
     }
   };
+
+  /**
+   * @return {Promise}
+   */
+  offerSubChanceAsync() {
+    const subName = this.team.subs[0].name;
+    return inquirer.prompt([
+      {
+        name: 'wantsToSub',
+        type: 'confirm',
+        message: `Do you want to bring in substitute player ${subName}?`,
+      },
+      {
+        name: 'doSub',
+        type: 'list',
+        message: `Please pick a starter to replace with ${subName}?`,
+        choices: this.team.starters.map((player) => player.name),
+        when: (answers) => answers.wantsToSub,
+      },
+    ])
+        .then((answers) => {
+          if (answers.wantsToSub) {
+            // assumes no players have the same name
+            const indexOfStarterToTakeOut = this.team.starters
+                .findIndex((it) => it.name = answers.doSub);
+            const starterTakenOut = this.team.starters
+                .splice(indexOfStarterToTakeOut, 1)[0];
+            // assumes only one sub
+            const sub = this.team.subs.splice(0, 1)[0];
+
+            this.team.starters.push(sub);
+            this.team.subs.push(starterTakenOut);
+
+            console.log(`${starterTakenOut.name} pulled out.`);
+            console.log(`${subName} sent in.`);
+          }
+        });
+  }
 
   /**
    *
@@ -82,8 +127,8 @@ class Tournament {
    * @return {number} sum of the team's players' [side] stat
    */
   calcPower(side) {
-    return this.team[side]
-        .map((it) => it.defense)
+    return this.team.starters
+        .map((it) => it[side])
         .reduce((sum, it) => sum + it);
   }
 }
