@@ -1,3 +1,5 @@
+const utils = require('./utils');
+
 /**
  * A tournament that consissts of playing N rounds
  */
@@ -46,20 +48,14 @@ class Tournament {
  *
  * @param {*} count
  */
-  playRound(count) {
+  playRoundAsync(count) {
     if (count == this.rounds) {
       return;
     }
-    const rando = () => Math.ceil(Math.random() * 20);
-    const enemyOffense = rando();
-    const enemyDefense = rando();
-    const myOffensivePower = this.team.starters
-        .map((it) => it.offense)
-        .reduce((sum, it) => sum + it);
-
-    const myDefensivePower = this.team.starters
-        .map((it) => it.defense)
-        .reduce((sum, it) => sum + it);
+    const enemyOffense = utils.randomNumber(20, 1);
+    const enemyDefense = utils.randomNumber(20, 1);
+    const myOffensivePower = this.calcPower('offense');
+    const myDefensivePower = this.calcPower('defense');
 
     let change = 0;
     if (enemyOffense < myOffensivePower) change = 1;
@@ -73,13 +69,23 @@ class Tournament {
 
     count++;
 
-
     if (change) {
       // doSubbing();
     } else {
       this.playRound(count);
     }
   };
+
+  /**
+   *
+   * @param {string} side property (offense | defense)
+   * @return {number} sum of the team's players' [side] stat
+   */
+  calcPower(side) {
+    return this.team[side]
+        .map((it) => it.defense)
+        .reduce((sum, it) => sum + it);
+  }
 }
 
 module.exports = Tournament;

@@ -1,3 +1,5 @@
+const utils = require('./utils');
+
 /**
  * A player
  */
@@ -48,7 +50,7 @@ class Player {
      * @return {string}
      */
   chooseQuality() {
-    return Math.floor(Math.random() * 2) ? 'defense' : 'offense';
+    return utils.randomNumber(1) ? 'defense' : 'offense';
   }
 }
 

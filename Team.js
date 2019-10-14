@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 
+const prompSets = require('./promptSets');
 const Player = require('./Player');
 
 /**
@@ -32,7 +33,7 @@ class Team {
     }
 
     return prompts.reduce((promiseChain, currentTask) => {
-      return promiseChain.then(() => currentTask());
+      return promiseChain.then(currentTask);
     }, Promise.resolve());
   }
   /**
@@ -46,40 +47,25 @@ class Team {
     console.log('\n-----');
     console.log(`Add a new ${isStarter ? 'starting' : 'sub'} player`);
 
-    return inquirer.prompt([
-      {
-        name: 'name',
-        message: 'What is the player\'s name?',
-      }, {
-        name: 'position',
-        message: 'What is the player\'s position?',
-      }, {
-        name: 'offense',
-        message: 'What is the player\'s offensive skill level?',
-        type: 'number',
-      }, {
-        name: 'defense',
-        message: 'What is the player\'s defensive skill level?',
-        type: 'number',
-      },
-    ]).then((answers) => {
-      // initializes the variable newProgrammer
-      // to be a programmer object which will take
-      // in all of the user's answers to the questions above
-      const player = new Player(
-          answers.name,
-          answers.position,
-          answers.offense,
-          answers.defense
-      );
-      if (isStarter) {
-        this.starters.push(player);
-      } else {
-        this.subs.push(player);
-      }
+    return inquirer.prompt(prompSets.addPlayer)
+        .then((answers) => {
+          // initializes the variable newProgrammer
+          // to be a programmer object which will take
+          // in all of the user's answers to the questions above
+          const player = new Player(
+              answers.name,
+              answers.position,
+              answers.offense,
+              answers.defense
+          );
+          if (isStarter) {
+            this.starters.push(player);
+          } else {
+            this.subs.push(player);
+          }
 
-      return player;
-    });
+          return player;
+        });
   }
 }
 
