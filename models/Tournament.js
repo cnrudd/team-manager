@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 
-const promptSets = require('./promptSets');
-const utils = require('./utils');
+const promptSets = require('../promptSets');
+const utils = require('../utils');
 
 /**
  * A tournament that consissts of playing N rounds
@@ -15,7 +15,7 @@ class Tournament {
   constructor(team, rounds) {
     this.team = team;
     this.rounds = rounds;
-    this.score = 0;
+    this.totalScore = 0;
   }
   /**
  *
@@ -27,7 +27,7 @@ class Tournament {
 -------------
 The tournament is starting!
 -------------
-`);
+    `);
 
     const roundsToPlay = [];
     for (let i = 0; i < this.rounds; i++) {
@@ -35,31 +35,43 @@ The tournament is starting!
     }
 
     return utils.runPromisesInSeries(roundsToPlay)
-        .then(() => {
-          console.log('tournament score:', this.score);
-
-          let outcome;
-
-          if (this.score < 0) {
-            outcome = 'lost';
-          } else if (this.score > 0) {
-            outcome = 'won';
-          } else {
-            outcome = 'tied';
-          }
-
-          console.log(
-              `Your team ${outcome} the tournament!`
-          );
-
-          this.team.starters.forEach((player) => {
-            if (this.score > 0) player.goodGame();
-            else if (this.score < 0) player.badGame();
-            player.printStats();
-          });
-        });
+        .then(() => this.solveTournamentOutcome());
   }
 
+  /**
+   * Calculate total score and whether team won/lost/tied
+   * after all rounds have been played
+   */
+  solveTournamentOutcome() {
+    let outcome;
+
+    // could be rewritten with ternary
+    if (this.totalScore < 0) {
+      outcome = 'LOST';
+    } else if (this.totalScore > 0) {
+      outcome = 'WON';
+    } else {
+      outcome = 'TIED';
+    }
+
+    console.log(`
+-------------
+Tournament score: ${this.totalScore}
+Your team ${outcome} the tournament!
+-------------
+    `);
+
+    console.log(`
+Here are your players' updated stats:
+-------------------------------------
+`);
+
+    this.team.starters.forEach((player) => {
+      if (this.totalScore > 0) player.goodGame();
+      else if (this.totalScore < 0) player.badGame();
+      player.printStats();
+    });
+  }
 
   /**
  *
@@ -72,17 +84,21 @@ The tournament is starting!
     const myOffensivePower = this.calcPower('offense');
     const myDefensivePower = this.calcPower('defense');
 
-    let change = 0;
-    if (enemyOffense < myOffensivePower) change = 1;
-    if (enemyDefense > myDefensivePower) change = -1;
-    const outcome = change == 0 ? 'tied' :
-      change == 1 ? 'won' :
-      'lost';
+    /**
+     * 2 examples of ternary chains
+     * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator}
+     */
+    const roundScore = (enemyOffense < myOffensivePower) ? 1 :
+      (enemyDefense > myDefensivePower) ? -1 :
+      0;
+    const outcome = roundScore == 0 ? 'TIED' :
+      roundScore == 1 ? 'WON' :
+      'LOST';
 
-    this.score += change;
-    console.log(`Round ${count}: you ${outcome}`);
+    this.totalScore += roundScore;
+    console.log(`--- Round ${count}: your team ${outcome}`);
 
-    if (change && count < this.rounds) {
+    if (outcome != 'TIED' && count < this.rounds) {
       return this.offerSubChanceAsync();
     } else {
       return Promise.resolve();
@@ -98,6 +114,13 @@ The tournament is starting!
     return inquirer.prompt(prompts)
         .then((answers) => {
           if (answers.wantsToSub) {
+            /**
+             * several array methods used here
+             * findIndex: @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex}
+             * push @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push}
+             * splice: @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice}
+             */
+
             // assumes no players have the same name
             const indexOfStarterToTakeOut = this.team.starters
                 .findIndex((it) => it.name == answers.doSub);
@@ -111,8 +134,8 @@ The tournament is starting!
             this.team.starters.push(sub);
             this.team.subs.push(starterTakenOut);
 
-            console.log(`${starterTakenOut.name} pulled out.`);
-            console.log(`${subName} sent in.`);
+            console.log(`--- ${starterTakenOut.name} pulled out.`);
+            console.log(`--- ${subName} sent in.`);
           }
         });
   }

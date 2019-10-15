@@ -1,8 +1,8 @@
 // dependency for inquirer npm package
 const inquirer = require('inquirer');
 
-const Team = require('./Team');
-const Tournament = require('./Tournament');
+const Team = require('./models/Team');
+const Tournament = require('./models/Tournament');
 
 /**
  * This is the main entry point to the whole application
@@ -27,6 +27,11 @@ function playTeamManager() {
             });
       });
 }
+
+console.log(`
+ULTIMATE TEAM MANAGER - THE GAME
+================================
+`);
 
 playTeamManager();
 

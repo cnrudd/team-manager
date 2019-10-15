@@ -17,6 +17,9 @@ module.exports = {
    *
    * @param {Array} promiseArray The array of promises to run
    * @return {Promise}
+   *
+   * @see {@link https://css-tricks.com/why-using-reduce-to-sequentially-resolve-promises-works/}
+   * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise}
    */
   runPromisesInSeries(promiseArray) {
     return promiseArray.reduce((promiseChain, currentTask) => {

@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 
-const utils = require('./utils');
-const promptSets = require('./promptSets');
+const utils = require('../utils');
+const promptSets = require('../promptSets');
 const Player = require('./Player');
 
 /**
@@ -32,6 +32,12 @@ class Team {
     for (let i = 0; i < this.subsCount; i++) {
       prompts.push(() => this.addPlayerAsync(false));
     }
+
+    console.log(`-------------
+Start by building your team.  
+You need to choose ${this.startersCount} starting players
+and ${this.subsCount} substitute player.
+-------------`);
 
     return utils.runPromisesInSeries(prompts);
   }
