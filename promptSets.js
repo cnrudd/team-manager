@@ -1,17 +1,17 @@
 
 /**
- *
- * @param {number} input
- * @param {object} answers  Answers object provided by Inquirer lib
- * @return {boolean} true for valid, false otherwise
+ * This module contains customizable prompt sets intended for use
+ * by the Inquirer library
+ * @module promptSets
+ * @see {@link https://www.npmjs.com/package/inquirer}
  */
-function withinRange(input, answers) {
-  return input >= 1 && input <= 10 ?
-    true :
-    'Please enter a number between 1 and 10';
-}
 
 module.exports = {
+  /**
+   *
+   * @param {Array} playerChoices List of player names
+   * @return {Array} The prompts needed to add one player to the team.
+   */
   addPlayer(playerChoices) {
     return [
       {
@@ -34,16 +34,23 @@ module.exports = {
         message: 'What is the player\'s offensive skill level (1 - 10)?',
         type: 'number',
         default: 5,
-        validate: withinRange,
+        validate: withinRange(1, 10),
       }, {
         name: 'defense',
         message: 'What is the player\'s defensive skill level (1 - 10)?',
         type: 'number',
         default: 5,
-        validate: withinRange,
+        validate: withinRange(1, 10),
       },
     ];
   },
+
+  /**
+   *
+   * @param {string} subName The name of the current substitute player.
+   * @param {Array} starters The array of current starting players.
+   * @return {Array} The prompts needed to sub in a player.
+   */
   subPlayer(subName, starters) {
     return [
       {
@@ -61,3 +68,18 @@ module.exports = {
     ];
   },
 };
+
+/**
+ *
+ * @param {number} min Smallest allowable number in range
+ * @param {number} max Largest allowable number in range
+ * @return {Function} an "Inquirer" compatible validation function
+ * @see {@link https://www.npmjs.com/package/inquirer#question}
+ */
+function withinRange(min, max) {
+  return function(input, answers) {
+    return input >= min && input <= max ?
+    true :
+    'Please enter a number between 1 and 10';
+  };
+}

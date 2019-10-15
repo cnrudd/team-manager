@@ -1,6 +1,7 @@
 /**
- * This file contains oft used functions that do not contain business logic
+ * This module contains oft used functions that do not contain business logic
  * (they could be reused in any program).
+ * @module utils
  */
 module.exports = {
   /**
